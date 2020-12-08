@@ -30,4 +30,14 @@ month must be one of the following example /months?month=January&year=2020
 
 POST:
 
+/user/register  
+body: {username,password,rePassword}
+response: userObject and sets a cookie with jwt
+desc: if the insertion in the DB is succsessfull a jwt token is created and stored in cookies, the user object is returned
+
+/user/login
+body: {username,password}
+response: userObject and sets a cookie with jwt
+desc: if a user is found in the DB a jwt token is created and stored in the cookies , the user object is returned
+
 DELETE:
