@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const userRoutes = require("./routes/userRoutes");
@@ -11,6 +12,7 @@ const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@getting
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
 mongoose.connect(
