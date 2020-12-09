@@ -25,7 +25,7 @@ router.post("/register", async (req, res) => {
     const user = new User({ username, password: hashedPas });
     const savedObj = await user.save();
     const token = genToken(savedObj._id, savedObj.username);
-    res.cookie("paint", token);
+    res.cookie("paint", token, { httpOnly: true });
     res.status(201).send(savedObj);
   } catch (err) {
     res.status(400).send(err.message);
@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
         res.status(200).send({ error: "No such user or password" });
       } else {
         const token = genToken(user._id, user.username);
-        res.cookie("paint", token);
+        res.cookie("paint", token, { httpOnly: true });
         res.status(200).send(user);
       }
     }
