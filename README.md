@@ -5,7 +5,7 @@ I use mongo atlas in order to store the data
 In order to use it you will need a username and password for mongo atlas.
 send me an email at georgikrustev235@abv.bg if you wish to get acces Otherwise just replace the url which is located in the index.js fail in the root folder . The server does not need preloaded data to function.
 
-ENDPOINTS
+##ENDPOINTS
 
 GET:
 
