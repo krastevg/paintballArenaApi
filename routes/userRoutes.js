@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const { genToken } = require("./helpers");
 
@@ -15,7 +16,7 @@ router.post("/register", async (req, res) => {
     !password.match(/^[A-Za-z0-9]{5,}$/) ||
     !username.match(/^[A-Za-z0-9]{5,20}$/)
   ) {
-    res.status(400).send({ error: "Data does not meet criteria" });
+    res.status(401).send({ error: { message: "Data does not meet criteria" } });
     return;
   }
 
@@ -28,7 +29,7 @@ router.post("/register", async (req, res) => {
     res.cookie("paint", token);
     res.status(201).send(savedObj);
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(401).send({ error: { message: err.message } });
     //   console.log(err);
   }
 });
@@ -40,18 +41,21 @@ router.post("/login", async (req, res) => {
     !password.match(/^[A-Za-z0-9]{5,}$/) ||
     !username.match(/^[A-Za-z0-9]{5,20}$/)
   ) {
-    res.status(400).send({ error: "Data does not meet criteria" });
+    res.status(401).send({ error: { message: "Data does not meet criteria" } });
+
     return;
   }
 
   try {
     const user = await User.findOne({ username });
     if (!user) {
-      res.status(200).send({ error: "No such user or password" });
+      res.status(401).send({ error: { message: "No such user or password" } });
     } else {
       const passmatch = await bcrypt.compare(password, user.password);
       if (!passmatch) {
-        res.status(200).send({ error: "No such user or password" });
+        res
+          .status(401)
+          .send({ error: { message: "No such user or password" } });
       } else {
         const token = genToken(user._id, user.username);
         res.cookie("paint", token);
@@ -59,7 +63,23 @@ router.post("/login", async (req, res) => {
       }
     }
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(401).send({ error: { message: err.message } });
+  }
+});
+
+router.get("/checkAuth", (req, res) => {
+  const cookieWithToken = req.cookies["paint"];
+  if (!cookieWithToken) {
+    res.status(401).send({ error: { message: "Cookie not found" } });
+  }
+
+  try {
+    const result = jwt.verify(cookieWithToken, process.env.PRIVATE_KEY); // throws if fail
+    console.log(result); //for  debugging
+    res.status(200).send({ message: "Auth is valid", flag: true });
+  } catch (err) {
+    console.log(err);
+    res.status(401).send({ error: { message: "Authentication FAILED" } });
   }
 });
 // router.get ...

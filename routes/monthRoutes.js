@@ -3,8 +3,9 @@ const express = require("express");
 const router = express.Router();
 const Month = require("../models/Month");
 const Day = require("../models/Day");
+const { authAccess } = require("./helpers");
 
-router.get("/months", async (req, res) => {
+router.get("/months", authAccess, async (req, res) => {
   //http://localhost:3000/months?month=Jan&year=2020
 
   const hasMonth = !!req.query.month;
@@ -27,14 +28,14 @@ router.get("/months", async (req, res) => {
         res.status(200).send(monthres); // the month already exists a populated query is returned
       }
     } catch (err) {
-      res.status(400).send(err.message);
+      res.status(400).send({ error: { message: err.message } });
     }
   } else {
     try {
       const months = await Month.find().populate("days").lean();
       res.status(200).send(months);
     } catch (err) {
-      res.status(400).send(err.message);
+      res.status(400).send({ error: { message: err.message } });
     }
   }
 });
