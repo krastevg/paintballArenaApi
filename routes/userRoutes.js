@@ -75,7 +75,7 @@ router.get("/checkAuth", (req, res) => {
 
   try {
     const result = jwt.verify(cookieWithToken, process.env.PRIVATE_KEY); // throws if fail
-    console.log(result); //for  debugging
+    //console.log(result); //for  debugging
     res.status(200).send({ message: "Auth is valid", flag: true });
   } catch (err) {
     console.log(err);

@@ -15,7 +15,7 @@ const authAccess = (req, res, next) => {
 
   try {
     const result = jwt.verify(cookieWithToken, process.env.PRIVATE_KEY); // throws if fail
-    console.log(result); //for  debugging
+    //console.log(result); //for  debugging
     next();
   } catch (err) {
     console.log(err);

@@ -6,8 +6,6 @@ const Day = require("../models/Day");
 const { authAccess } = require("./helpers");
 
 router.get("/months", authAccess, async (req, res) => {
-  //http://localhost:3000/months?month=Jan&year=2020
-
   const hasMonth = !!req.query.month;
   const hasYear = !!req.query.year;
 
@@ -94,6 +92,7 @@ async function makeDays(year, month1, req, res) {
       counter = 0;
     }
   }
+
   // creating documents
   for (let i = 0; i < days[month1]; i++) {
     testArr.push({
