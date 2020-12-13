@@ -7,6 +7,7 @@ const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const reservationRoutes = require("./routes/reservationRoutes");
 const monthRouter = require("./routes/monthRoutes");
+const dayRouter = require("./routes/dayRoutes");
 
 const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@gettingstarted.lywkb.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 const app = express();
@@ -41,5 +42,6 @@ mongoose.connect(
 app.use("/user", userRoutes);
 app.use("/reservation", reservationRoutes);
 app.use("/", monthRouter);
+app.use("/", dayRouter);
 
 app.listen(3000, console.log("Listening on port 3000"));
