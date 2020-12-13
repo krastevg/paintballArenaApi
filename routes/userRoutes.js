@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const { genToken } = require("./helpers");
+const { genToken, authAccess } = require("./helpers");
 
 router.post("/register", async (req, res) => {
   const { username, password, rePassword } = req.body;
@@ -80,6 +80,22 @@ router.get("/checkAuth", (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(401).send({ error: { message: "Authentication FAILED" } });
+  }
+});
+
+router.get("/profile", authAccess, async (req, res) => {
+  const userId = req.query.userId;
+  if (!!userId) {
+    try {
+      const result = await User.findById(userId)
+        .populate("reservations")
+        .lean();
+      res.status(200).send(result);
+    } catch (err) {
+      res.status(400).send({ error: { message: err.message } });
+    }
+  } else {
+    res.status(400).send({ error: { message: "No id provided" } });
   }
 });
 // router.get ...
