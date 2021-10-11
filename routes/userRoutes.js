@@ -4,50 +4,32 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const { genToken, authAccess } = require("./helpers");
+const { genToken, authAccess, dataValidation } = require("./helpers");
+const { registrationComplete } = require("../mailer/mailer");
 
-router.post("/register", async (req, res) => {
-  const { username, password, rePassword } = req.body;
-
-  // check if data is valid
-
-  if (
-    password !== rePassword ||
-    !password.match(/^[A-Za-z0-9]{5,}$/) ||
-    !username.match(/^[A-Za-z0-9]{5,20}$/)
-  ) {
-    res.status(401).send({ error: { message: "Data does not meet criteria" } });
-    return;
-  }
+router.post("/", dataValidation, async (req, res) => {
+  const { email, password } = req.body;
 
   try {
     const salt = await bcrypt.genSalt(Number(process.env.SALT_ROUNDS));
     const hashedPas = await bcrypt.hash(password, salt);
-    const user = new User({ username, password: hashedPas });
+    const user = new User({ email, password: hashedPas });
     const savedObj = await user.save();
-    const token = genToken(savedObj._id, savedObj.username);
-    res.cookie("paint", token);
-    res.status(201).send(savedObj);
+    const token = genToken(savedObj._id, savedObj.email);
+    res.cookie("paint", token); // adding cookie
+    res.status(201).send(savedObj); // sending response to the client
+    registrationComplete(email); // sending an email for the registration
   } catch (err) {
-    res.status(401).send({ error: { message: err.message } });
+    res.status(500).send({ error: { message: err.message } });
     //   console.log(err);
   }
 });
 
-router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  if (
-    !password.match(/^[A-Za-z0-9]{5,}$/) ||
-    !username.match(/^[A-Za-z0-9]{5,20}$/)
-  ) {
-    res.status(401).send({ error: { message: "Data does not meet criteria" } });
-
-    return;
-  }
+router.post("/login", dataValidation, async (req, res) => {
+  const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email });
     if (!user) {
       res.status(401).send({ error: { message: "No such user or password" } });
     } else {
@@ -57,30 +39,23 @@ router.post("/login", async (req, res) => {
           .status(401)
           .send({ error: { message: "No such user or password" } });
       } else {
-        const token = genToken(user._id, user.username);
+        const token = genToken(user._id, user.email);
         res.cookie("paint", token);
-        res.status(200).send(user);
+        res.status(200).send({
+          id: user._id,
+          email: user.email,
+          reservations: user.reservations,
+        });
       }
     }
   } catch (err) {
-    res.status(401).send({ error: { message: err.message } });
+    res.status(500).send({ error: { message: err.message } });
   }
 });
 
-router.get("/checkAuth", (req, res) => {
-  const cookieWithToken = req.cookies["paint"];
-  if (!cookieWithToken) {
-    res.status(401).send({ error: { message: "Cookie not found" } });
-  }
-
-  try {
-    const result = jwt.verify(cookieWithToken, process.env.PRIVATE_KEY); // throws if fail
-    //console.log(result); //for  debugging
-    res.status(200).send({ message: "Auth is valid", flag: true });
-  } catch (err) {
-    console.log(err);
-    res.status(401).send({ error: { message: "Authentication FAILED" } });
-  }
+router.get("/checkAuth", authAccess, (req, res) => {
+  // validest the jwt that the user sends via authAccess , is called to check if the user has access on the front end
+  res.status(200).send({ message: "Auth is valid", flag: true });
 });
 
 router.get("/profile", authAccess, async (req, res) => {

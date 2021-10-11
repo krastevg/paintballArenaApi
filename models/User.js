@@ -1,18 +1,24 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  username: {
+  email: {
     type: String,
-    required: true,
     unique: true,
+    required: true,
     match: [
-      /^[A-Za-z0-9]{5,20}$/,
-      "User must contain english characters and numbers only and be at least 5 symbols",
+      /^([\w!#$%&'*+\-\/=?^_`{|\.]{3,64})@([\w\.]{3,253})\.([a-z]{2,3})$/,
+      "Not a valid email address",
     ],
   },
   password: {
     type: String,
     required: true,
+  },
+
+  role: {
+    type: String,
+    enum: ["admin", "user"],
+    default: "user",
   },
 
   reservations: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],

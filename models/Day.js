@@ -1,24 +1,47 @@
 const mongoose = require("mongoose");
 
 const daySchema = new mongoose.Schema({
-  date: {
+  day: {
     type: Number,
     max: 31,
     min: 1,
   },
-  dayOfWeek: {
+  weekday: {
     type: String,
+    enum: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
   },
   month: {
     type: String,
+    enum: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
   },
 
   year: {
     type: Number,
   },
-  firstFrame: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
-  secondFrame: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
-  thirdFrame: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
+  timeframes: { type: [Number], default: [40, 40, 40] },
+
+  reservationsMade: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
 });
 
 module.exports = mongoose.model("Day", daySchema);

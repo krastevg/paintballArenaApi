@@ -13,6 +13,7 @@ const reservationSchema = new mongoose.Schema({
   price: {
     type: Number,
     default: 0,
+    min: 0,
   },
 
   user: {
@@ -20,14 +21,22 @@ const reservationSchema = new mongoose.Schema({
     ref: "User",
   },
 
-  hours: {
+  timeframe: {
     type: String,
+    enum: ["08:00-12:00", "12:30-16:30", "17:00-21:00"],
+    required: true,
+    default: "08:00-12:00",
+  },
+
+  gear: {
+    type: Boolean,
+    default: false,
   },
 
   people: {
     type: Number,
-    min: 6,
-    max: 20,
+    min: 1,
+    max: 40,
   },
 });
 
