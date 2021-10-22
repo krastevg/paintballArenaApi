@@ -1,7 +1,7 @@
 
 # PaintballAppApi
 
-This is an API made for my angular project for a course in SoftUni
+This is an API made for my Angular project Paintball Arena
 
 I use mongo atlas in order to store the data
 
