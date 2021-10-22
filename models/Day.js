@@ -39,7 +39,7 @@ const daySchema = new mongoose.Schema({
   year: {
     type: Number,
   },
-  timeframes: { type: [Number], default: [40, 40, 40] },
+  timeframes: {type:Object, default: {"08:00-12:00": 40, "12:30-16:30": 40, "17:00-21:00":40}},
 
   reservationsMade: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
 });

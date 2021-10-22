@@ -39,7 +39,7 @@ mongoose.connect(
 );
 
 app.use("/user", userRoutes);
-app.use("/reservation", reservationRoutes);
+app.use("/reservations", reservationRoutes);
 app.use("/days", dayRouter);
 
 app.listen(3000, console.log("Listening on port 3000"));

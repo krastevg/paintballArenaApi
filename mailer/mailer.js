@@ -26,4 +26,28 @@ const registrationComplete = (userEmail) => {
   });
 };
 
-module.exports = { registrationComplete };
+const reservationComplete = (
+  userEmail,
+  dayObject,
+  people,
+  price,
+  timeframe
+) => {
+  const options = {
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    port: 587,
+    subject: "Reservation Complete",
+    text: `Your reservation for ${people} at ${dayObject.weekday} ${dayObject.day} ${dayObject.month} ${dayObject.year} - ${timeframe} for the price of ${price} has been completed sucsesfuly!`,
+  };
+
+  transporter.sendMail(options, (err, info) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Response: ${info.response}`);
+  });
+};
+
+module.exports = { registrationComplete, reservationComplete };

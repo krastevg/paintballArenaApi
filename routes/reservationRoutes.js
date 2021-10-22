@@ -1,34 +1,65 @@
 const express = require("express");
 const router = express.Router();
 const Reservation = require("../models/Reservation");
-const { authAccess } = require("./helpers");
+const User = require("../models/User");
+const { reservationComplete } = require("../mailer/mailer");
+const {
+  authAccess,
+  getUser,
+  reservationValidation,
+  getDay,
+} = require("./helpers");
 
-router.post("/makeReservation", authAccess, async (req, res) => {
-  let { hours, people } = req.body;
-  people = Number(people);
-  const userId = req.query.userId;
-  const dayId = req.query.dayId;
-  const price = Number(req.query.price);
+router.post(
+  "/",
+  authAccess,
+  getUser,
+  getDay,
+  reservationValidation,
+  async (req, res) => {
+    const { people, gear, dayId, price, user, timeframe, payment } = req.body;
+    try {
+      // creating reservation
+      const reservation = new Reservation({
+        day: dayId,
+        price,
+        user,
+        timeframe,
+        gear,
+        people,
+        payment,
+      });
+      // write to the db  reservation
+      const reservationResult = await reservation.save();
+      // add reservation to the day and add reservation to the user
+      req.userResult.reservations.push(reservationResult._id);
+      const saveReservationToUser = await req.userResult.save();
+      //console.log(saveReservationToUser);
+      req.dayResult.reservationsMade.push(reservationResult._id);
 
-  if (people < 6 || people > 20) {
-    res.status(400).send({ error: { message: "Data does not meet criteria" } });
-    return;
+      req.dayResult.set(
+        `timeframes.${timeframe}`,
+        req.dayResult.timeframes[timeframe] - people
+      );
+
+      //console.log(req.dayResult.timeframes[timeframe]);
+      const saveReservationToDay = await req.dayResult.save();
+      //console.log(saveReservationToDay);
+      reservationComplete(
+        req.userResult.email,
+        req.dayResult,
+        people,
+        price,
+        timeframe
+      );
+      res
+        .status(201)
+        .send({ message: `Reservation created - ${reservationResult._id} !` });
+    } catch (err) {
+      res.status(500).send({ error: { message: err.message } });
+    }
   }
-
-  try {
-    const reservation = new Reservation({
-      day: dayId,
-      user: userId,
-      people,
-      price,
-      hours,
-    });
-    const result = await reservation.save();
-    res.status(201).send(result);
-  } catch (err) {
-    res.status(400).send({ error: { message: err.message } });
-  }
-});
+);
 
 router.delete("/delete/:_id", authAccess, async (req, res) => {
   const id = req.params._id;

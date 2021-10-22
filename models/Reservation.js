@@ -25,7 +25,6 @@ const reservationSchema = new mongoose.Schema({
     type: String,
     enum: ["08:00-12:00", "12:30-16:30", "17:00-21:00"],
     required: true,
-    default: "08:00-12:00",
   },
 
   gear: {
@@ -37,6 +36,11 @@ const reservationSchema = new mongoose.Schema({
     type: Number,
     min: 1,
     max: 40,
+  },
+  payment: {
+    type: String,
+    required: true,
+    enum: ["online", "inPerson"],
   },
 });
 

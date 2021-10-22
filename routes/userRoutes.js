@@ -73,5 +73,4 @@ router.get("/profile", authAccess, async (req, res) => {
     res.status(400).send({ error: { message: "No id provided" } });
   }
 });
-// router.get ...
 module.exports = router;
