@@ -2,9 +2,9 @@ const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
-const { genToken, authAccess, dataValidation } = require("./helpers");
+const { genToken, authAccess } = require("../helpers/authentication");
+const { dataValidation } = require("../helpers/validators");
 const { registrationComplete } = require("../mailer/mailer");
 
 router.post("/", dataValidation, async (req, res) => {
@@ -58,7 +58,7 @@ router.get("/checkAuth", authAccess, (req, res) => {
   res.status(200).send({ message: "Auth is valid", flag: true });
 });
 
-router.get("/profile", authAccess, async (req, res) => {
+router.get("/profile/:userId", authAccess, async (req, res) => {
   const userId = req.query.userId;
   if (!!userId) {
     try {

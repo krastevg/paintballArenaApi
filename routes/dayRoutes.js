@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Day = require("../models/Day");
-const { authAccess } = require("./helpers");
+const { authAccess } = require("../helpers/authentication");
+const { validateDayData } = require("../helpers/validators");
 
 router.post("/", authAccess, async (req, res) => {
   const { year, month, weekday, day } = req.body;
@@ -36,50 +37,5 @@ router.post("/", authAccess, async (req, res) => {
     res.status(500).send({ error: { message: err.message } });
   }
 });
-
-function validateDayData(year, month, weekday, day) {
-  const weekdayArr = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
-  const monthArr = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  if (!!year && !!month && !!weekday && !!day) {
-    // will continue only if all parameters are present
-    if (
-      Number(year) !== NaN &&
-      Number(day) !== NaN &&
-      Number(day) <= 31 &&
-      Number(day) >= 1
-    ) {
-      // numerical check
-      if (weekdayArr.includes(weekday) && monthArr.includes(month)) {
-        // check if the month provided is in the array
-        return true; // all checks passed return true
-      }
-    }
-
-    return false;
-  }
-
-  return false;
-}
 
 module.exports = router;

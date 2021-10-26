@@ -1,14 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Reservation = require("../models/Reservation");
-const User = require("../models/User");
 const { reservationComplete } = require("../mailer/mailer");
-const {
-  authAccess,
-  getUser,
-  reservationValidation,
-  getDay,
-} = require("./helpers");
+const { authAccess } = require("../helpers/authentication");
+const { getUser, getDay } = require("../helpers/getModels");
+const { reservationValidation } = require("../helpers/validators");
 
 router.post(
   "/",
@@ -17,7 +13,8 @@ router.post(
   getDay,
   reservationValidation,
   async (req, res) => {
-    const { people, gear, dayId, price, user, timeframe, payment } = req.body;
+    const { people, gear, dayId, price, timeframe, payment } = req.body;
+    const user = req.query.userId;
     try {
       // creating reservation
       const reservation = new Reservation({
@@ -71,8 +68,8 @@ router.delete("/delete/:_id", authAccess, async (req, res) => {
   }
 });
 
-router.get("/getByUser/:userId", authAccess, async (req, res) => {
-  const userId = req.params.userId;
+router.get("/", authAccess, async (req, res) => {
+  const userId = req.query.userId;
   try {
     const result = await Reservation.find({ user: userId })
       .populate("day")

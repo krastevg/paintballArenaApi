@@ -1,30 +1,3 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const Day = require("../models/Day");
-// generates jwt token
-const genToken = (id, email) => {
-  const token = jwt.sign({ id, email }, process.env.PRIVATE_KEY);
-
-  return token;
-};
-// checks for authentication
-const authAccess = (req, res, next) => {
-  const cookieWithToken = req.cookies["paint"];
-  if (!cookieWithToken) {
-    res.status(401).send({ error: { message: "JWT token not found !" } });
-    return;
-  }
-
-  try {
-    const result = jwt.verify(cookieWithToken, process.env.PRIVATE_KEY);
-    next();
-  } catch (err) {
-    console.log(err);
-    res.status(401).send({ error: { message: "Authentication FAILED" } });
-    return;
-  }
-};
-
 const dataValidation = (req, res, next) => {
   // validates data fields for user register and login
   let { email, password, rePassword } = req.body;
@@ -102,42 +75,54 @@ const numberOfPeopleValidation = (dayResult, people, timeframe) => {
   }
   return false;
 };
-// returns the user from the database, found by ID
-const getUser = async (req, res, next) => {
-  const userId = req.body.user;
-  if (!!userId) {
-    try {
-      const userResult = await User.findById(userId);
-      req.userResult = userResult;
-      next();
-    } catch (err) {
-      res.status(500).send({ error: { message: err.message } });
+
+function validateDayData(year, month, weekday, day) {
+  const weekdayArr = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const monthArr = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  if (!!year && !!month && !!weekday && !!day) {
+    // will continue only if all parameters are present
+    if (
+      Number(year) !== NaN &&
+      Number(day) !== NaN &&
+      Number(day) <= 31 &&
+      Number(day) >= 1
+    ) {
+      // numerical check
+      if (weekdayArr.includes(weekday) && monthArr.includes(month)) {
+        // check if the month provided is in the array
+        return true; // all checks passed return true
+      }
     }
-  } else {
-    res.status(400).send({ error: { message: "UserId needs to be provided" } });
+
+    return false;
   }
-};
-// gets the Day by ID
-const getDay = async (req, res, next) => {
-  const dayId = req.body.dayId;
-  if (!!dayId) {
-    try {
-      const dayResult = await Day.findById(dayId);
-      req.dayResult = dayResult;
-      next();
-    } catch (err) {
-      res.status(500).send({ error: { message: err.message } });
-    }
-  } else {
-    res.status(400).send({ error: { message: "dayId needs to be provided" } });
-  }
-};
+
+  return false;
+}
 
 module.exports = {
-  genToken,
-  authAccess,
   dataValidation,
   reservationValidation,
-  getUser,
-  getDay,
+  validateDayData,
 };
