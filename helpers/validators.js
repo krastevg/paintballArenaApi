@@ -1,3 +1,5 @@
+const { createDate, getCurrentDate } = require("./dateHelpers");
+
 const dataValidation = (req, res, next) => {
   // validates data fields for user register and login
   let { email, password, rePassword } = req.body;
@@ -43,12 +45,22 @@ const reservationValidation = (req, res, next) => {
     !!userResult &&
     !!dayResult &&
     numberOfPeopleValidation(dayResult, people, timeframe) &&
-    priceValidation(gear, price, people, priceNoGear, priceWithGear)
+    priceValidation(gear, price, people, priceNoGear, priceWithGear) &&
+    checkDate(dayResult.month, dayResult.day, dayResult.year)
   ) {
     next();
   } else {
     res.status(400).send({ error: { message: "Data not valid" } });
   }
+};
+
+const checkDate = (month, day, year) => {
+  const reservationDate = createDate(month, day, year);
+  const currentDate = getCurrentDate();
+
+  console.log("checkDate", reservationDate, currentDate);
+
+  return reservationDate.getTime() > currentDate.getTime() ? true : false;
 };
 // validates that the given price is equal to the one that the user sees in the front end
 const priceValidation = (gear, price, people, priceNoGear, priceWithGear) => {
@@ -100,6 +112,7 @@ function validateDayData(year, month, weekday, day) {
     "November",
     "December",
   ];
+
   if (!!year && !!month && !!weekday && !!day) {
     // will continue only if all parameters are present
     if (
@@ -111,11 +124,9 @@ function validateDayData(year, month, weekday, day) {
       // numerical check
       if (weekdayArr.includes(weekday) && monthArr.includes(month)) {
         // check if the month provided is in the array
-        return true; // all checks passed return true
+        return true;
       }
     }
-
-    return false;
   }
 
   return false;

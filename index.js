@@ -3,10 +3,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const cron = require("node-cron");
 
 const userRoutes = require("./routes/userRoutes");
 const reservationRoutes = require("./routes/reservationRoutes");
 const dayRouter = require("./routes/dayRoutes");
+const { changeReservationStatus } = require("./helpers/reservation");
 
 const url = process.env.URL;
 const app = express();
@@ -43,3 +45,8 @@ app.use("/reservations", reservationRoutes);
 app.use("/days", dayRouter);
 
 app.listen(3000, console.log("Listening on port 3000"));
+
+// will execute at the specified time
+cron.schedule("0 0 0 * * *", changeReservationStatus, {
+  timezone: "Europe/Sofia",
+});

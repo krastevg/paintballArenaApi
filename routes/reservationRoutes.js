@@ -31,24 +31,19 @@ router.post(
       // add reservation to the day and add reservation to the user
       req.userResult.reservations.push(reservationResult._id);
       const saveReservationToUser = await req.userResult.save();
-      //console.log(saveReservationToUser);
       req.dayResult.reservationsMade.push(reservationResult._id);
-
       req.dayResult.set(
         `timeframes.${timeframe}`,
         req.dayResult.timeframes[timeframe] - people
       );
-
-      //console.log(req.dayResult.timeframes[timeframe]);
       const saveReservationToDay = await req.dayResult.save();
-      //console.log(saveReservationToDay);
-      reservationComplete(
-        req.userResult.email,
-        req.dayResult,
-        people,
-        price,
-        timeframe
-      );
+      // reservationComplete(
+      //   req.userResult.email,
+      //   req.dayResult,
+      //   people,
+      //   price,
+      //   timeframe
+      // );
       res
         .status(201)
         .send({ message: `Reservation created - ${reservationResult._id} !` });
@@ -58,15 +53,17 @@ router.post(
   }
 );
 
-router.delete("/delete/:_id", authAccess, async (req, res) => {
-  const id = req.params._id;
-  try {
-    const result = await Reservation.findByIdAndDelete(id);
-    res.status(200).send(result);
-  } catch (err) {
-    res.status(400).send({ error: { message: err.message } });
-  }
-});
+// router.delete("/delete/:_id", authAccess, async (req, res) => {
+//   const id = req.params._id;
+//   try {
+//     const result = await Reservation.findByIdAndDelete(id);
+//     res.status(200).send(result);
+//   } catch (err) {
+//     res.status(400).send({ error: { message: err.message } });
+//   }
+// });
+
+//TODO : CANCLE RESERVATION LOGIC
 
 router.get("/", authAccess, async (req, res) => {
   const userId = req.query.userId;

@@ -58,19 +58,4 @@ router.get("/checkAuth", authAccess, (req, res) => {
   res.status(200).send({ message: "Auth is valid", flag: true });
 });
 
-router.get("/profile/:userId", authAccess, async (req, res) => {
-  const userId = req.query.userId;
-  if (!!userId) {
-    try {
-      const result = await User.findById(userId)
-        .populate("reservations")
-        .lean();
-      res.status(200).send(result);
-    } catch (err) {
-      res.status(400).send({ error: { message: err.message } });
-    }
-  } else {
-    res.status(400).send({ error: { message: "No id provided" } });
-  }
-});
 module.exports = router;

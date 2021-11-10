@@ -42,6 +42,12 @@ const reservationSchema = new mongoose.Schema({
     required: true,
     enum: ["online", "inPerson"],
   },
+  status: {
+    type: String,
+    required: true,
+    enum: ["active", "complete", "canceled"],
+    default: "active",
+  },
 });
 
 module.exports = mongoose.model("Reservation", reservationSchema);
