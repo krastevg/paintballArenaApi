@@ -2,7 +2,7 @@ const User = require("../models/User");
 const Day = require("../models/Day");
 // attaches the user to the request object from the database, found by ID
 const getUser = async (req, res, next) => {
-  const userId = req.query.userId;
+  const userId = req.loggedIn.id;
   if (!!userId) {
     try {
       const userResult = await User.findById(userId);

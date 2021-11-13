@@ -3,9 +3,14 @@ const User = require("../models/User");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 
-const { genToken, authAccess } = require("../helpers/authentication");
-const { dataValidation } = require("../helpers/validators");
-const { registrationComplete } = require("../mailer/mailer");
+const {
+  genToken,
+  authAccess,
+  checkImpostor,
+} = require("../helpers/authentication");
+const { getUser } = require("../helpers/getModels");
+const { dataValidation, passwordValidation } = require("../helpers/validators");
+const { registrationComplete, passwordChange } = require("../mailer/mailer");
 
 router.post("/", dataValidation, async (req, res) => {
   const { email, password } = req.body;
@@ -56,6 +61,41 @@ router.post("/login", dataValidation, async (req, res) => {
 router.get("/checkAuth", authAccess, (req, res) => {
   // validest the jwt that the user sends via authAccess , is called to check if the user has access on the front end
   res.status(200).send({ message: "Auth is valid", flag: true });
+});
+
+router.patch("/:id/changepassword", authAccess, getUser, async (req, res) => {
+  const forUser = req.params.id;
+  const { newPass, rePass } = req.body;
+
+  try {
+    if (!checkImpostor(req.loggedIn.id, forUser)) {
+      throw { message: "Impostor Detected" };
+    }
+
+    if (!passwordValidation(newPass, rePass)) {
+      throw { message: "Passwords do not match" };
+    }
+    const salt = await bcrypt.genSalt(Number(process.env.SALT_ROUNDS));
+    const hashedPas = await bcrypt.hash(newPass, salt);
+    req.userResult.password = hashedPas;
+    await req.userResult.save();
+    //passwordChange(req.userResult.email);
+    res.status(200).send({ message: "Password Changed!" });
+  } catch (err) {
+    console.log(err);
+    switch (err.message) {
+      case "Impostor Detected": {
+        res.status(401).send({ error: { message: "Impostor Detected" } });
+      }
+      case "Passwords do not match": {
+        res.status(400).send({ error: { message: "Passwords do not match" } });
+      }
+
+      default: {
+        res.status(500).send({ error: { message: "Something went wrong" } });
+      }
+    }
+  }
 });
 
 module.exports = router;

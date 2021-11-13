@@ -50,4 +50,22 @@ const reservationComplete = (
   });
 };
 
-module.exports = { registrationComplete, reservationComplete };
+const passwordChange = (userEmail) => {
+  const options = {
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    port: 587,
+    subject: "PaintballHeaven - Password change",
+    text: `Your password has been changed successfully!`,
+  };
+
+  transporter.sendMail(options, (err, info) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Response: ${info.response}`);
+  });
+};
+
+module.exports = { registrationComplete, reservationComplete, passwordChange };

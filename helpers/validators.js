@@ -6,8 +6,7 @@ const dataValidation = (req, res, next) => {
   rePassword = rePassword || password;
 
   if (
-    password !== rePassword ||
-    !password.match(/^[A-Za-z0-9]{5,}$/) ||
+    !passwordValidation(password, rePassword) ||
     !email.match(
       /^([\w!#$%&'*+\-\/=?^_`{|\.]{3,64})@([\w\.]{3,253})\.([a-z]{2,3})$/
     )
@@ -18,6 +17,12 @@ const dataValidation = (req, res, next) => {
 
   next();
 };
+
+//returns true if the passwords match
+const passwordValidation = (password, rePassword) => {
+  return password !== rePassword ? false : true;
+};
+
 // checks if all needed data for the validation is provided to the back end correctly
 // needs to be called AFTER getDay and getUser
 const reservationValidation = (req, res, next) => {
@@ -136,4 +141,5 @@ module.exports = {
   dataValidation,
   reservationValidation,
   validateDayData,
+  passwordValidation,
 };

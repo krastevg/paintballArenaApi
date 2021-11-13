@@ -8,20 +8,14 @@ const genToken = (id, email) => {
 // checks for authentication
 const authAccess = (req, res, next) => {
   const cookieWithToken = req.cookies["paint"];
-  const loggedinUser = req.query.userId;
   if (!cookieWithToken) {
     res.status(401).send({ error: { message: "JWT token not found !" } });
     return;
   }
-
   try {
-    const result = jwt.verify(cookieWithToken, process.env.PRIVATE_KEY);
-    console.log(result.id, loggedinUser);
-    if (result.id === loggedinUser) {
-      next();
-    } else {
-      throw "Impostor detected";
-    }
+    const result = jwt.verify(cookieWithToken, process.env.PRIVATE_KEY); // throws if failed is synchronous
+    req.loggedIn = result;
+    next();
   } catch (err) {
     console.log(err);
     res.status(401).send({ error: { message: "Authentication FAILED" } });
@@ -29,7 +23,14 @@ const authAccess = (req, res, next) => {
   }
 };
 
+const checkImpostor = (loggedIn, requestedFor) => {
+  // checks if the user ID is the same as the one which the request is for
+  console.log(loggedIn, requestedFor);
+  return loggedIn.id === requestedFor ? false : true;
+};
+
 module.exports = {
   genToken,
   authAccess,
+  checkImpostor,
 };

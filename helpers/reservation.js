@@ -4,7 +4,9 @@ const { getCurrentDate, createDate } = require("./dateHelpers");
 const changeReservationStatus = async () => {
   // get all reservations
   try {
-    const reservations = await Reservation.find().populate("day");
+    const reservations = await Reservation.find({ status: "active" }).populate(
+      "day"
+    );
     for (let reservationObj of reservations) {
       if (cantCancel(reservationObj)) {
         reservationObj.status = "complete";
