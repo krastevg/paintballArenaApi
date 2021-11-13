@@ -68,4 +68,27 @@ const passwordChange = (userEmail) => {
   });
 };
 
-module.exports = { registrationComplete, reservationComplete, passwordChange };
+const passwordReset = (userEmail, newPass) => {
+  const options = {
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    port: 587,
+    subject: "PaintballHeaven - Password reset",
+    text: `Your new password is "${newPass}". Please use it the next time you try to log into our system. You can change it at any time in the Profile tab!`,
+  };
+
+  transporter.sendMail(options, (err, info) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Response: ${info.response}`);
+  });
+};
+
+module.exports = {
+  registrationComplete,
+  reservationComplete,
+  passwordChange,
+  passwordReset,
+};

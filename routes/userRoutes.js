@@ -10,7 +10,12 @@ const {
 } = require("../helpers/authentication");
 const { getUser } = require("../helpers/getModels");
 const { dataValidation, passwordValidation } = require("../helpers/validators");
-const { registrationComplete, passwordChange } = require("../mailer/mailer");
+const {
+  registrationComplete,
+  passwordChange,
+  passwordReset,
+} = require("../mailer/mailer");
+const { generatePassword } = require("../helpers/password");
 
 router.post("/", dataValidation, async (req, res) => {
   const { email, password } = req.body;
@@ -92,9 +97,32 @@ router.patch("/:id/changepassword", authAccess, getUser, async (req, res) => {
       }
 
       default: {
-        res.status(500).send({ error: { message: "Something went wrong" } });
+        res.status(500).send({
+          error: { message: "Unexpected error! Please try again later!" },
+        });
       }
     }
+  }
+});
+
+router.post("/:email/resetpassword", async (req, res) => {
+  const userEmail = req.params.email;
+  const newPass = generatePassword();
+  try {
+    const user = await User.find({ email: userEmail });
+    if (user.length !== 0) {
+      const salt = await bcrypt.genSalt(Number(process.env.SALT_ROUNDS));
+      const hashedPas = await bcrypt.hash(newPass, salt);
+      user[0].password = hashedPas;
+      await user[0].save();
+      //passwordReset(userEmail, newPass);
+    }
+    res.status(200).send({ message: "Password reset sent!" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      error: { message: "Unexpected error! Please try again later!" },
+    });
   }
 });
 
