@@ -1,9 +1,9 @@
 const crypto = require("crypto");
 
-const generatePassword = () => {
-  return crypto.randomBytes(3).toString("hex");
+const generateRandomString = (numberOfBytes) => {
+  return crypto.randomBytes(numberOfBytes).toString("hex");
 };
 
 module.exports = {
-  generatePassword,
+  generateRandomString,
 };

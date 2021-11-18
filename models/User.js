@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema({
   },
 
   reservations: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
+
+  requests: [{ type: mongoose.Types.ObjectId, ref: "Request" }],
 });
 
 module.exports = mongoose.model("User", userSchema);

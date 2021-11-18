@@ -86,9 +86,47 @@ const passwordReset = (userEmail, newPass) => {
   });
 };
 
+const sendEmailChangeCode = (userEmail, code) => {
+  const options = {
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    port: 587,
+    subject: "PaintballHeaven - Email Change Code",
+    text: `Your email change code is "${code}". It will be active for 24 hours. If this was not requested by you, please secure your account.`,
+  };
+
+  transporter.sendMail(options, (err, info) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Response: ${info.response}`);
+  });
+};
+
+const emailChanged = (userEmail) => {
+  const options = {
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    port: 587,
+    subject: "PaintballHeaven - Email Change Code",
+    text: `Your email has been changed sucsesfully! Please use this email the next time you try to log into our system.`,
+  };
+
+  transporter.sendMail(options, (err, info) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Response: ${info.response}`);
+  });
+};
+
 module.exports = {
   registrationComplete,
   reservationComplete,
   passwordChange,
   passwordReset,
+  sendEmailChangeCode,
+  emailChanged,
 };
