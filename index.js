@@ -8,6 +8,7 @@ const cron = require("node-cron");
 const userRoutes = require("./routes/userRoutes");
 const reservationRoutes = require("./routes/reservationRoutes");
 const dayRouter = require("./routes/dayRoutes");
+const adminRouter = require("./routes/adminRoutes");
 const { changeReservationStatus, expireRequests } = require("./helpers/expire");
 
 const url = process.env.URL;
@@ -43,6 +44,7 @@ mongoose.connect(
 app.use("/user", userRoutes);
 app.use("/reservations", reservationRoutes);
 app.use("/days", dayRouter);
+app.use("/admin", adminRouter);
 
 app.listen(3000, console.log("Listening on port 3000"));
 
@@ -51,6 +53,6 @@ cron.schedule("0 0 0 * * *", changeReservationStatus, {
   timezone: "Europe/Sofia",
 });
 
-cron.schedule("0 0 * * * *", expireRequests, {
+cron.schedule("10 0 * * * *", expireRequests, {
   timezone: "Europe/Sofia",
 });

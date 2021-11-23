@@ -1,7 +1,9 @@
 const jwt = require("jsonwebtoken");
 // generates jwt token
-const genToken = (id, email) => {
-  const token = jwt.sign({ id, email }, process.env.PRIVATE_KEY);
+const genToken = (id, email, role) => {
+  const token = jwt.sign({ id, email, role }, process.env.PRIVATE_KEY, {
+    expiresIn: "15m",
+  });
 
   return token;
 };
@@ -25,12 +27,23 @@ const authAccess = (req, res, next) => {
 
 const checkImpostor = (loggedIn, requestedFor) => {
   // checks if the user ID is the same as the one which the request is for
-  console.log(loggedIn, requestedFor);
   return loggedIn.id === requestedFor ? false : true;
+};
+
+const checkAdmin = (req, res, next) => {
+  // must be called after AuthAccess
+
+  if (req.loggedIn.role === "admin") {
+    next();
+  } else {
+    res.status(401).send({ error: { message: "Not an administrator" } });
+    return;
+  }
 };
 
 module.exports = {
   genToken,
   authAccess,
   checkImpostor,
+  checkAdmin,
 };

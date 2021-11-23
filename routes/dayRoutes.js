@@ -3,11 +3,10 @@ const router = express.Router();
 const Day = require("../models/Day");
 const { authAccess } = require("../helpers/authentication");
 const { validateDayData } = require("../helpers/validators");
+const { createDate } = require("../helpers/dateHelpers");
 
 router.post("/", authAccess, async (req, res) => {
   const { year, month, weekday, day } = req.body;
-
-  console.log(year, month, weekday, day);
 
   if (!validateDayData(year, month, weekday, day)) {
     // checking data
@@ -30,6 +29,7 @@ router.post("/", authAccess, async (req, res) => {
       month,
       weekday,
       day,
+      date: createDate(month, day, year),
     });
     const result = await newDay.save();
     res.status(201).send(result); // new day is created

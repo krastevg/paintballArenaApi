@@ -122,6 +122,24 @@ const emailChanged = (userEmail) => {
   });
 };
 
+const adminRegistration = (email, password) => {
+  const options = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    port: 587,
+    subject: "PaintballHeaven - Admin Registration complete",
+    text: `Admin account created! Please use this email and password("${password}") to log into your admin account.`,
+  };
+
+  transporter.sendMail(options, (err, info) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Response: ${info.response}`);
+  });
+};
+
 module.exports = {
   registrationComplete,
   reservationComplete,
@@ -129,4 +147,5 @@ module.exports = {
   passwordReset,
   sendEmailChangeCode,
   emailChanged,
+  adminRegistration,
 };

@@ -28,8 +28,6 @@ const canCancel = (reservationObj) => {
 
   const currentDate = getCurrentDate();
 
-  console.log(reservationDate, currentDate);
-
   return reservationDate.getTime() <= currentDate.getTime() ? true : false;
 };
 
@@ -38,8 +36,6 @@ const hasExpired = (requestObj) => {
   //day * hours*  minutes * seconds *miliseconds
   const dateNow = Date.now();
   const expiryDate = requestObj.madeAt.getTime() + oneDay;
-
-  console.log(dateNow, expiryDate);
 
   return dateNow >= expiryDate ? true : false;
 };

@@ -28,13 +28,17 @@ router.post("/", dataValidation, async (req, res) => {
     const hashedPas = await bcrypt.hash(password, salt);
     const user = new User({ email, password: hashedPas });
     const savedObj = await user.save();
-    const token = genToken(savedObj._id, savedObj.email);
+    const token = genToken(savedObj._id, savedObj.email, savedObj.role);
     res.cookie("paint", token); // adding cookie
-    res.status(201).send(savedObj); // sending response to the client
+    res.status(201).send({
+      id: savedObj._id,
+      email: savedObj.email,
+      reservations: savedObj.reservations,
+      role: savedObj.role,
+    }); // sending response to the client
     registrationComplete(email); // sending an email for the registration
   } catch (err) {
     res.status(500).send({ error: { message: err.message } });
-    //   console.log(err);
   }
 });
 
@@ -52,12 +56,13 @@ router.post("/login", dataValidation, async (req, res) => {
           .status(401)
           .send({ error: { message: "No such user or password" } });
       } else {
-        const token = genToken(user._id, user.email);
+        const token = genToken(user._id, user.email, user.role);
         res.cookie("paint", token);
         res.status(200).send({
           id: user._id,
           email: user.email,
           reservations: user.reservations,
+          role: user.role,
         });
       }
     }
@@ -204,6 +209,7 @@ router.patch("/:id/emailchange", authAccess, getUser, async (req, res) => {
         email: req.userResult.email,
         id: req.userResult._id,
         reservations: req.userResult.reservations,
+        role: req.userResult.role,
       },
     });
   } catch (err) {
