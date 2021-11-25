@@ -152,8 +152,6 @@ router.post("/:id/emailcode", authAccess, getUser, async (req, res) => {
       user: req.userResult._id,
     });
     await emailChangeRequest.save();
-    req.userResult.requests.push(emailChangeRequest._id);
-    await req.userResult.save();
     sendEmailChangeCode(req.userResult.email, emailCode);
     res.status(200).send({ message: "Email change code sent!" });
   } catch (err) {

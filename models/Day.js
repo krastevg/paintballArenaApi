@@ -44,8 +44,6 @@ const daySchema = new mongoose.Schema({
     default: { "08:00-12:00": 40, "12:30-16:30": 40, "17:00-21:00": 40 },
   },
 
-  reservationsMade: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
-
   date: {
     type: Date,
     required: true,

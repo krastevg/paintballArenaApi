@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema({
     enum: ["admin", "user"],
     default: "user",
   },
-
-  reservations: [{ type: mongoose.Types.ObjectId, ref: "Reservation" }],
-
-  requests: [{ type: mongoose.Types.ObjectId, ref: "Request" }],
 });
 
 module.exports = mongoose.model("User", userSchema);
