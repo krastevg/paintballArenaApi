@@ -107,7 +107,7 @@ router.get("/revenue/date", authAccess, checkAdmin, async (req, res) => {
         status,
         payment: payment === "inPerson" ? "In Person" : "Online",
         price,
-        user: user.email,
+        user: user ? user.email : "deleted user",
       });
     }
 
